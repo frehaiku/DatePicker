@@ -1,0 +1,79 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+.calendar-header {
+    position: relative;
+    background-color: #c61b01;
+    padding: 10px 0;
+    overflow: auto;
+    width: 280px;
+}
+
+.calendar-mid{
+    position: absolute;
+    left: 50%;
+    -webkit-transform: translate(-50%);
+    transform: translate(-50%);
+}
+
+.calendar-header .leftArrow {
+    width: 0;
+    height: 0;
+    border-width: 10px;
+    border-style: solid;
+    border-top-color: transparent;
+    border-bottom-color: transparent;
+    border-left-color: transparent;
+    border-right-color: #ffffff;
+    margin-left: 5px;
+    float: left;
+    cursor: pointer;
+}
+
+.calendar-header .rightArrow {
+    width: 0;
+    height: 0;
+    border-width: 10px;
+    border-style: solid;
+    border-top-color: transparent;
+    border-bottom-color: transparent;
+    border-left-color: #fff;
+    border-right-color: transparent;
+    margin-left: 5px;
+    float: right;
+    cursor: pointer;
+}
+
+.dateWrap {
+    width: 280px;
+}
+
+ul.weekTip, ul.date {
+    font-size: 0;
+}
+
+ul.weekTip > li, ul.date > li {
+    display: inline-block;
+    font-size: 15px;
+    color: #000000;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    cursor: pointer;
+}
+
+ul.date > li.active{
+    background-color: rgb(200, 17, 1);
+    color: #ffffff;
+}
+
+ul > li.weekend {
+    color: rgb(200, 17, 1);
+}
+
+ul > li.disabled {
+    color: lightgray;
+}
