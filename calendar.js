@@ -202,12 +202,12 @@ function Calendar(config) {
             date += "<ul class='date'>";
             arr.forEach(function (ele, ind) {
                 var line = Math.floor(ind / 6);
-                if (!(ind % 7) || ind === line * 6 + line - 1)
-                    date += "<li class='weekend'>" + ele.num + "</li>"
-                else if (ele.isInner)
-                    date += "<li class='abled'>" + ele.num + "</li>";
-                else
+                if (!ele.isInner)
                     date += "<li class='disabled'>" + ele.num + "</li>";
+                else if (!(ind % 7) || ind === line * 6 + line - 1)
+                    date += "<li class='weekend'>" + ele.num + "</li>";
+                else
+                    date += "<li class='abled'>" + ele.num + "</li>";
             });
             date += "</ul>";
 
@@ -218,7 +218,7 @@ function Calendar(config) {
             var header = document.querySelector(this.target + " .calendar-header");
             // remove
             if (header.nextElementSibling)
-            header.parentNode.removeChild(header.nextElementSibling);
+                header.parentNode.removeChild(header.nextElementSibling);
             // insert
             header.parentNode.insertBefore(dateContainer, header.nextSibling);
 
