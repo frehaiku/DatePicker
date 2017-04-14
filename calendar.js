@@ -216,11 +216,13 @@ function Calendar(config) {
             dateContainer.innerHTML = date;
 
             var header = document.querySelector(this.target + " .calendar-header");
-            // remove
-            if (header.nextElementSibling)
-                header.parentNode.removeChild(header.nextElementSibling);
-            // insert
-            header.parentNode.insertBefore(dateContainer, header.nextSibling);
+            // add
+            var fload;
+            if (fload = (header.nextElementSibling)) {
+                header.parentNode.replaceChild(dateContainer, fload);
+            } else {
+                header.parentNode.insertBefore(dateContainer, null);
+            }
 
             this._selected(" .year option", this.nonceYear);
             this._selected(" .date option", this.nonceMonth + 1);
@@ -279,13 +281,16 @@ function Calendar(config) {
 
             /**
              * 日期点击监听
+             * 2017/4/14 fixed：用事件冒泡的方式监听动态添加元素的绑定事件
              */
-            utils.bind(document.querySelector(self.target + " ul.date"),
+            utils.bind(document,
                 'click',
                 function (e) {
                     utils.delegates(e,
                         'li',
                         function (t) {
+                        // 父元素不是ul.date时跳出
+                        if (!t.parentNode.classList.contains('date')) return;
                             self.nonceDay = +(t.innerHTML);
                             utils.removeClass(t.parentNode.querySelectorAll('li'), 'active');
                             utils.addClass(t, 'active');
