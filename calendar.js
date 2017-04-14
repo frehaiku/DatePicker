@@ -125,7 +125,7 @@ function Calendar(config) {
                     throw "default option is invalid, please check the options and reset `YYYY-mm-dd` or `YYYY-mm`";
                 else {
                     self.nonceYear = relate[0];
-                    self.nonceMonth = relate[1];
+                    self.nonceMonth = +relate[1] - 1;
                     self.nonceDay = relate[2] || 1;
                 }
             }
