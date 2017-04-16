@@ -1,24 +1,27 @@
-/**
- *  日历组件
- *
- * @param config {el: obj, default: '2017-04-11' | '2017-04'}
- * @constructor
- */
-function Calendar(config) {
-
-    this.target = config.el;
-    this.defaultDate = config.default || 'today';
-    this.selectInterval = config.interval || [1970, 2030];
-    this.nonceYear = 0;
-    this.nonceMonth = 0;
-    this.nonceDay = 0;
-
-    this.init();
-}
+var DatePicker;
 
 (function () {
     "use strict";
 
+    /**
+     *  日历组件
+     *
+     * @param config {el: HTMLElement, default: '2017-04-11' | '2017-04'}
+     * @constructor
+     */
+    function Calendar(config) {
+
+        this.target = config.el;
+        this.defaultDate = config.default || 'today';
+        this.selectInterval = config.interval || [1970, 2030];
+        this.nonceYear = 0;
+        this.nonceMonth = 0;
+        this.nonceDay = 0;
+
+        this.init();
+    }
+
+    DatePicker = Calendar;
     var utils = {
         bind: function (el, event, listener) {
             var handler;
@@ -72,7 +75,8 @@ function Calendar(config) {
             var yearOpts = this._productOptions(this.selectInterval, '年');
             var dateOpts = this._productOptions([1, 12], '月');
             // 初始化布局
-            var navTop = "<div class='calendar-header'>" +
+            var navTop = "<div class='calendar-wrapper'>" +
+                "<div class='calendar-header'>" +
                 "<span class='leftArrow'></span>" +
                 "<div class='calendar-mid'>" +
                 "<select class='year'>" +
@@ -83,9 +87,10 @@ function Calendar(config) {
                 "</select>" +
                 "</div>" +
                 "<span class='rightArrow'></span>" +
+                "</div>" +
                 "</div>";
 
-            document.querySelector(this.target).innerHTML = navTop;
+            this.target.innerHTML = navTop;
 
             this._setDefault();
 
@@ -149,7 +154,8 @@ function Calendar(config) {
                 , 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
             var renderList = [],
-                prevMonthDays = monthMuchDay[this.nonceMonth - 1],
+                /*4/16 Fixed 当前月为1月份，手动设置上一个月为12月份*/
+                prevMonthDays = this.nonceMonth - 1 > 0 ? monthMuchDay[this.nonceMonth - 1] : 31,
                 nonceMonthDays = monthMuchDay[this.nonceMonth];
             /*一个月的最后一天星期几*/
             var monthLastDay = new Date(this.nonceYear, this.nonceMonth, nonceMonthDays).getDay();
@@ -215,7 +221,7 @@ function Calendar(config) {
             dateContainer.className = 'dateWrap';
             dateContainer.innerHTML = date;
 
-            var header = document.querySelector(this.target + " .calendar-header");
+            var header = this.target.querySelector(" .calendar-header");
             // add
             var fload;
             if (fload = (header.nextElementSibling)) {
@@ -234,7 +240,7 @@ function Calendar(config) {
          * @private
          */
         _selected: function (selector, tag) {
-            var options = document.querySelectorAll(this.target + selector);
+            var options = this.target.querySelectorAll(selector);
             ([]).forEach.call(options, function (ele) {
                 if (ele.value === tag.toString()) {
                     ele.setAttribute('selected', 'selected');
@@ -245,6 +251,34 @@ function Calendar(config) {
         },
 
         /**
+         * 上一个月的操作
+         * @private
+         */
+        _prevMonth: function () {
+            if (this.nonceMonth === 0) {
+                this.nonceYear--;
+                this.nonceMonth = 11;
+            } else {
+                this.nonceMonth--;
+            }
+            this._setDateList();
+        },
+
+        /**
+         * 下一个月的操作
+         * @private
+         */
+        _nextMonth: function () {
+            if (this.nonceMonth === 11) {
+                this.nonceYear++;
+                this.nonceMonth = 0;
+            } else {
+                this.nonceMonth++;
+            }
+            this._setDateList();
+        },
+
+        /**
          * 各种事件监听
          */
         eventListener: function () {
@@ -252,31 +286,19 @@ function Calendar(config) {
             /**
              * 左箭头监听
              */
-            utils.bind(document.querySelector(self.target + " .leftArrow"),
+            utils.bind(self.target.querySelector(".leftArrow"),
                 'click',
                 function () {
-                    if (self.nonceMonth === 0) {
-                        self.nonceYear--;
-                        self.nonceMonth = 11;
-                    } else {
-                        self.nonceMonth--;
-                    }
-                    self._setDateList();
+                    self._prevMonth();
                 });
 
             /**
              * 右箭头监听
              */
-            utils.bind(document.querySelector(self.target + " .rightArrow"),
+            utils.bind(self.target.querySelector(".rightArrow"),
                 'click',
                 function () {
-                    if (self.nonceMonth === 11) {
-                        self.nonceYear++;
-                        self.nonceMonth = 0;
-                    } else {
-                        self.nonceMonth++;
-                    }
-                    self._setDateList();
+                    self._nextMonth();
                 });
 
             /**
@@ -289,8 +311,8 @@ function Calendar(config) {
                     utils.delegates(e,
                         'li',
                         function (t) {
-                        // 父元素不是ul.date时跳出
-                        if (!t.parentNode.classList.contains('date')) return;
+                            // 父元素不是ul.date时跳出
+                            if (!t.parentNode.classList.contains('date')) return;
                             self.nonceDay = +(t.innerHTML);
                             utils.removeClass(t.parentNode.querySelectorAll('li'), 'active');
                             utils.addClass(t, 'active');
@@ -300,7 +322,7 @@ function Calendar(config) {
             /**
              * 年份选择框监听
              */
-            utils.bind(document.querySelector(self.target + " select.year"),
+            utils.bind(self.target.querySelector("select.year"),
                 'change',
                 function (e) {
                     self.nonceYear = e.target.value;
@@ -311,7 +333,7 @@ function Calendar(config) {
             /**
              * 月份选择框监听
              */
-            utils.bind(document.querySelector(self.target + " select.date"),
+            utils.bind(self.target.querySelector("select.date"),
                 'change',
                 function (e) {
                     self.nonceMonth = e.target.value - 1;
@@ -320,6 +342,5 @@ function Calendar(config) {
                 });
         }
     }
-
 
 })();
