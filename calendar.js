@@ -4,9 +4,8 @@ var DatePicker;
     "use strict";
 
     /**
-     *  日历组件
-     *
-     * @param config {el: HTMLElement, default: '2017-04-11' | '2017-04'}
+     * 日历组件
+     * @param config {target: DOM, defaultDate: '2017-04-15', selectInterval: [2000, 2020]}
      * @constructor
      */
     function Calendar(config) {
@@ -14,10 +13,16 @@ var DatePicker;
         this.target = config.el;
         this.defaultDate = config.default || 'today';
         this.selectInterval = config.interval || [1970, 2030];
+        // 当前日历数据
         this.nonceYear = 0;
         this.nonceMonth = 0;
         this.nonceDay = 0;
 
+        // 选中的数据
+        this.selectedYear = 0;
+        this.selectedMonth = 0;
+        // 日期数组
+        this.renderDate = [];
         this.init();
     }
 
@@ -46,7 +51,7 @@ var DatePicker;
         addClass: function (el, className) {
 
             var ol = el.className;
-            if (ol.split(' ').indexOf(className) == -1) {
+            if (ol.split(' ').indexOf(className) === -1) {
                 el.className = ol + " " + className;
             }
 
@@ -134,6 +139,9 @@ var DatePicker;
                     self.nonceDay = relate[2] || 1;
                 }
             }
+            // 设置选中的默认年份与月份
+            self.selectedYear = self.nonceYear;
+            self.selectedMonth = self.nonceMonth;
             self._setDateList();
 
 
@@ -186,6 +194,7 @@ var DatePicker;
                 };
                 renderList.push(obj);
             }
+            this.renderDate = renderList;
 
             this._doRender(renderList);
         },
@@ -196,20 +205,25 @@ var DatePicker;
          */
         _doRender: function (arr) {
 
-            var date = "<ul class='weekTip'>" +
-                "<li class='weekend'>日</li>" +
-                "<li>一</li>" +
-                "<li>二</li>" +
-                "<li>三</li>" +
-                "<li>四</li>" +
-                "<li>五</li>" +
-                "<li class='weekend'>六</li>" +
-                "</ul>";
+            var self = this,
+                date = "<ul class='weekTip'>" +
+                    "<li class='weekend'>日</li>" +
+                    "<li>一</li>" +
+                    "<li>二</li>" +
+                    "<li>三</li>" +
+                    "<li>四</li>" +
+                    "<li>五</li>" +
+                    "<li class='weekend'>六</li>" +
+                    "</ul>";
             date += "<ul class='date'>";
             arr.forEach(function (ele, ind) {
                 var line = Math.floor(ind / 6);
                 if (!ele.isInner)
                     date += "<li class='disabled'>" + ele.num + "</li>";
+                else if (ele.num === self.nonceDay &&
+                    self.nonceMonth === self.selectedMonth &&
+                    self.nonceYear === self.selectedYear)
+                    date += "<li class='abled active'>" + ele.num + "</li>";
                 else if (!(ind % 7) || ind === line * 6 + line - 1)
                     date += "<li class='weekend'>" + ele.num + "</li>";
                 else
@@ -313,9 +327,25 @@ var DatePicker;
                         function (t) {
                             // 父元素不是ul.date时跳出
                             if (!t.parentNode.classList.contains('date')) return;
+
                             self.nonceDay = +(t.innerHTML);
-                            utils.removeClass(t.parentNode.querySelectorAll('li'), 'active');
-                            utils.addClass(t, 'active');
+                            // 点击的是非本月的日期
+                            var clkId = [].indexOf.call(t.parentElement.children, t);
+                            if (!self.renderDate[clkId].isInner) {
+                                if (self.nonceDay > 15) {
+                                    self.selectedMonth = self.nonceMonth - 1;
+                                    self._prevMonth();
+                                } else {
+                                    self.selectedMonth = self.nonceMonth + 1;
+                                    self._nextMonth();
+                                }
+                            } else {
+                                self.selectedMonth = self.nonceMonth;
+                            }
+
+                            self.selectedYear = self.nonceYear;
+
+                            self._setDateList();
                         })
                 });
 
