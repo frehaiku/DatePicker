@@ -6,13 +6,25 @@
     <link rel="stylesheet" href="calendar.css">
 </head>
 <body>
-    <div id="calendar"></div>
+<label>
+    Please select the datetime when you on vacation.
+    <input type="text" id="datePicker">
+</label>
+<span id="calendar"></span>
 
-    <script src="calendar.js"></script>
-    <script>
-        new DatePicker({
-            el: document.querySelector('#calendar')
-        })
-    </script>
+<script src="calendar.js"></script>
+<script>
+    var dateComponent = new DatePicker({
+        el: document.querySelector('#calendar'),
+        afterSelectFn: function (curr) {
+            dateInput.value = curr;
+        }
+    })
+        , dateInput = document.querySelector('#datePicker');
+
+    dateInput.onfocus = function () {
+        dateComponent.show();
+    };
+</script>
 </body>
 </html>

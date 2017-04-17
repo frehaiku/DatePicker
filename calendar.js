@@ -13,6 +13,13 @@ var DatePicker;
         this.target = config.el;
         this.defaultDate = config.default || 'today';
         this.selectInterval = config.interval || [1970, 2030];
+
+        this.showFn = config.showFn || function () {
+            };
+        this.hideFn = config.hideFn || function () {
+            };
+        this.afterSelectFn = config.afterSelectFn || function () {
+            };
         // 当前日历数据
         this.nonceYear = 0;
         this.nonceMonth = 0;
@@ -72,10 +79,24 @@ var DatePicker;
     Calendar.prototype = {
         constructor: Calendar,
 
+        show: function () {
+            this.target.style.display = 'inline-block';
+            this.showFn();
+        },
+
+        hide: function () {
+            this.target.style.display = 'none';
+            this.hideFn();
+        },
+
+        get: function () {
+            return this.selectedYear + '-' + (this.selectedMonth + 1) + '-' + this.nonceDay;
+        },
         /**
          * 初始化
          */
         init: function () {
+            this.hide();
             // compute select year
             var yearOpts = this._productOptions(this.selectInterval, '年');
             var dateOpts = this._productOptions([1, 12], '月');
@@ -346,6 +367,10 @@ var DatePicker;
                             self.selectedYear = self.nonceYear;
 
                             self._setDateList();
+
+                            self.afterSelectFn(self.get());
+
+                            self.hide();
                         })
                 });
 
@@ -370,6 +395,7 @@ var DatePicker;
                     self._setDateList();
 
                 });
+
         }
     }
 
