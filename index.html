@@ -14,15 +14,18 @@
 <script>
     var dateComponent = new DatePicker({
         el: document.querySelector('#calendar'),
+        isRadio: 0,
         afterSelectFn: function (curr) {
             dateInput.value = curr;
         }
     })
         , dateInput = document.querySelector('#datePicker');
 
-    dateInput.onfocus = function () {
+    dateComponent.show();
+
+    /*dateInput.onfocus = function () {
         dateComponent.show();
-    };
+    };*/
 </script>
 </body>
 </html>
