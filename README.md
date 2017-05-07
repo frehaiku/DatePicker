@@ -1,17 +1,71 @@
 # DatePicker
-> A date component with single selected, No Jquery
+
+Without jQuery-based date component with support for date ranges, muitiple calendars and more.
 
 ## Params
 
-- el: Calendar container | Element
-- defaultDate: default selected date | String | '2017-04-15'
-- selectInterval: select abled range | Array | [2000, 2020]
-- showFn: after show callback | Function
-- hideFn: after hide callback | Function
-- afterSelectFn: rewrite dateString to element | Function
+- el: 
+    - type: **Element**
+    - required: `true`
+    - description: A calendar container 
+- defaultDate:
+    - type: **String**
+    - default: `'today'`
+    - eg: `'2017-04-15'`
+    - description: Default selected date
+- isRadio:
+    - type: **Boolean**
+    - default: `false`
+    - description: Is it date radio selected?
+- lang:
+    - type: **String**
+    - options: `'EN'` | `'CN'`
+    - default: `'EN'`
+    - description: The font language, for `CN` will use Chinese, for `EN` will use English
+- selectInterval: 
+    - type: **Array**
+    - default: `[1970, 2030]`
+    - eg:`[2000, 2020]`
+    - description: Select abled range
+- showFn:
+    - type: **Function**
+    - description: After show callback
+- hideFn:
+    - type: **Function**
+    - description: After hide callback 
+- afterSelectFn:
+    - type: **Function**
+    - description: Rewrite dateString to element
 
 ## Methods
 
-- show: Function
-- hide: Function
+- show: 
+    - type: **Function**
+- hide:
+    - type: **Function**
+    
+## Usage
+
+1. manually import `calendar.css` and `calendar.js`
+2. create DatePicker contructor, for below:
+    ```html
+    <input type="text" id="datePicker">
+    <span id="calendar"></span>
+    ```
+    
+
+```js
+   var dateComponent = new DatePicker({
+           el: document.querySelector('#calendar'),
+           afterSelectFn: function (curr) {
+               dateInput.value = curr;
+           }
+   });
+   
+   var dateInput = document.querySelector('#datePicker');
+   
+   dateInput.onfocus = function () {
+        dateComponent.show();
+   };
+```
 

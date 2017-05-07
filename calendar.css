@@ -4,6 +4,9 @@
 }
 
 .calendar-wrapper {
+    position: absolute;
+    right: 0;
+    top: 0;
     max-width: 310px;
 }
 
@@ -64,6 +67,7 @@ ul.weekTip > li, ul.date > li {
     line-height: 40px;
     text-align: center;
     cursor: pointer;
+    margin-bottom: 5px;
 }
 
 ul.weekTip > li:not(:nth-of-type(7n)), ul.date > li:not(:nth-of-type(7n)) {
@@ -87,3 +91,6 @@ ul > li.weekend {
 ul > li.disabled {
     color: lightgray;
 }
+
+#demo {
+    position: relative;}

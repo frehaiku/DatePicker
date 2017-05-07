@@ -40,8 +40,6 @@ var DatePicker;
                 day: 0
             }
         };
-        // this.selectedYear = 0;
-        // this.selectedMonth = 0;
         // 日期数组
         this.renderDate = [];
         this.init();
@@ -423,7 +421,12 @@ var DatePicker;
 
                             self.afterSelectFn(self.get());
 
-                            // self.hide();
+                            // 判断是否为范围选择
+                            if (!self.isRadio && self.selectedDate.end.year) {
+                                self.hide();
+                            } else if (self.isRadio) {
+                                self.hide();
+                            }
                         })
                 });
 
@@ -457,9 +460,8 @@ var DatePicker;
                 // 选中的日期是否在开始日期前面
                 function isSelFront() {
                     // 选择下一个月的日期时
-                    if (/disabled/.test(target.className)
-                    && day < 15) {
-                        return false;
+                    if (/disabled/.test(target.className)) {
+                        return !(day < 15);
                     } else {
                         return (
                             +new Date(self.nonceYear, self.nonceMonth, day)
