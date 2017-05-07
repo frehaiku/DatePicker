@@ -4,7 +4,7 @@
 }
 
 .calendar-wrapper {
-    width: 280px;
+    max-width: 310px;
 }
 
 .calendar-header {
@@ -55,18 +55,29 @@ ul.weekTip, ul.date {
 
 ul.weekTip > li, ul.date > li {
     display: inline-block;
+    box-sizing: border-box;
     font-size: 15px;
     color: #000000;
     width: 40px;
     height: 40px;
+    border-radius:50%;
     line-height: 40px;
     text-align: center;
     cursor: pointer;
 }
 
+ul.weekTip > li:not(:nth-of-type(7n)), ul.date > li:not(:nth-of-type(7n)) {
+    margin-right: 5px;
+}
+
 ul.date > li.active {
     background-color: rgb(200, 17, 1);
     color: #ffffff;
+}
+
+ul.date > li.across {
+    border: 1px solid rgb(200, 17, 1);
+    color: rgb(200, 17, 1);
 }
 
 ul > li.weekend {

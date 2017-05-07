@@ -12,7 +12,7 @@ var DatePicker;
 
         this.target = config.el;
         this.defaultDate = config.default || 'today';
-        this.isRadio = !!(config.isRadio) || 1;
+        this.isRadio = !!(config.isRadio);
         this.lang = (config.lang == 'CN') ? config.lang : 'EN'
         this.selectInterval = config.interval || [1970, 2030];
 
@@ -104,18 +104,23 @@ var DatePicker;
         },
 
         get: function () {
-            var self  = this;
+            var self = this;
 
             function format(attr) {
+                // 结束日期为空时，不显示
+                if (attr == 'end'
+                    && !self.selectedDate[attr].year) {
+                    return;
+                }
                 return self.selectedDate[attr].year +
                     '-' +
-                    self.selectedDate[attr].month +
+                    (self.selectedDate[attr].month + 1) +
                     '-' +
                     self.selectedDate[attr].day;
             }
 
             var currBegin = format('begin')
-            , currEnd = format('end');
+                , currEnd = format('end');
             if (this.isRadio) {
                 return currBegin;
             } else {
@@ -128,8 +133,8 @@ var DatePicker;
         init: function () {
             this.hide();
             // compute select year
-            var yearOpts = this._productOptions(this.selectInterval, '年');
-            var dateOpts = this._productOptions([1, 12], '月');
+            var yearOpts = this._productOptions(this.selectInterval, this.lang == 'CN' ? '年' : '');
+            var dateOpts = this._productOptions([1, 12], this.lang == 'CN' ? '月' : '');
             // 初始化布局
             var navTop = "<div class='calendar-wrapper'>" +
                 "<div class='calendar-header'>" +
@@ -267,7 +272,13 @@ var DatePicker;
                     } else {
                         return "<li>" + ele + "</li>"
                     }
-                });
+                }),
+                selectedBgTs = +new Date(self.selectedDate.begin.year,
+                    self.selectedDate.begin.month,
+                    self.selectedDate.begin.day),
+                selectedEndTs = +new Date(self.selectedDate.end.year,
+                    self.selectedDate.end.month,
+                    self.selectedDate.end.day);
 
             var date = "<ul class='weekTip'>" +
                 label.join('') +
@@ -275,16 +286,30 @@ var DatePicker;
 
             date += "<ul class='date'>";
 
+
             arr.forEach(function (ele, ind) {
-                var line = Math.floor(ind / 6);
+                var line = Math.floor(ind / 6)
+                    , currTs = +new Date(self.nonceYear, self.nonceMonth, ele.num);
+                // 非这个月的日子
                 if (!ele.isInner)
                     date += "<li class='disabled'>" + ele.num + "</li>";
+                // 选中的开始日子
                 else if (ele.num === self.selectedDate.begin.day &&
                     self.nonceMonth === self.selectedDate.begin.month &&
                     self.nonceYear === self.selectedDate.begin.year)
                     date += "<li class='abled active'>" + ele.num + "</li>";
+                // 选中的结束日子
+                else if (ele.num === self.selectedDate.end.day &&
+                    self.nonceMonth === self.selectedDate.end.month &&
+                    self.nonceYear === self.selectedDate.end.year)
+                    date += "<li class='abled active'>" + ele.num + "</li>";
+                // 间隔的日子
+                else if (currTs > selectedBgTs && currTs < selectedEndTs)
+                    date += "<li class='abled across'>" + ele.num + "</li>";
+                // 周末的日子
                 else if (!(ind % 7) || ind === line * 6 + line - 1)
                     date += "<li class='weekend'>" + ele.num + "</li>";
+                // 未选中的日子
                 else
                     date += "<li class='abled'>" + ele.num + "</li>";
             });
@@ -389,9 +414,9 @@ var DatePicker;
                             if (!t.parentNode.classList.contains('date')) return;
 
                             if (self.isRadio) {
-                                selectRadio(self, t);
+                                selectRadio(self, 'begin', t);
                             } else {
-
+                                selectRange(self, t);
                             }
 
                             self._setDateList();
@@ -403,27 +428,57 @@ var DatePicker;
                 });
 
             // 选一个日期时
-            function selectRadio(oDate, target) {
-                oDate.selectedDate.begin.day = +(target.innerHTML);
+            function selectRadio(oDate, type, target) {
+                oDate.selectedDate[type].day = +(target.innerHTML);
                 // 点击的是非本月的日期
                 var clkId = [].indexOf.call(target.parentElement.children, target);
                 if (!oDate.renderDate[clkId].isInner) {
-                    if (oDate.selectedDate.begin.day > 15) {
-                        oDate.selectedDate.begin.month = oDate.nonceMonth - 1;
+                    if (oDate.selectedDate[type].day > 15) {
+                        oDate.selectedDate[type].month = oDate.nonceMonth - 1;
                         oDate._prevMonth();
                     } else {
-                        oDate.selectedDate.begin.month = oDate.nonceMonth + 1;
+                        oDate.selectedDate[type].month = oDate.nonceMonth + 1;
                         oDate._nextMonth();
                     }
                 } else {
-                    oDate.selectedDate.begin.month = oDate.nonceMonth;
+                    oDate.selectedDate[type].month = oDate.nonceMonth;
                 }
 
-                oDate.selectedDate.begin.year = oDate.nonceYear;
+                oDate.selectedDate[type].year = oDate.nonceYear;
             }
 
             // 选日期范围
             function selectRange(oDate, target) {
+                var oSelected = self.selectedDate
+                    , isSelEnd = (!!oSelected.end.year)
+                    , isSelBg = (!!oSelected.begin.day)
+                    , day = +(target.innerHTML);
+
+                // 选中的日期是否在开始日期前面
+                function isSelFront() {
+                    // 选择下一个月的日期时
+                    if (/disabled/.test(target.className)
+                    && day < 15) {
+                        return false;
+                    } else {
+                        return (
+                            +new Date(self.nonceYear, self.nonceMonth, day)
+                            < +new Date(oSelected.begin.year, oSelected.begin.month, oSelected.begin.day)
+                        )
+                    }
+                }
+
+                // 未选择起始时间 || 将选择的时间在begin前面
+                if (!isSelBg || (!isSelEnd && isSelFront())) {
+                    selectRadio.call(null, oDate, 'begin', target)
+                }
+                // 未选择截止时间
+                else if (isSelBg && !isSelEnd) {
+                    selectRadio.call(null, oDate, 'end', target)
+                } else {
+                    selectRadio.call(null, oDate, 'begin', target)
+                    oSelected.end.year = 0;
+                }
 
             }
 
