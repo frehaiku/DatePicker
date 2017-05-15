@@ -10,10 +10,24 @@ var DatePicker;
      */
     function Calendar(config) {
 
-        this.target = config.el;
+        this.target = function () {
+            if (config.el) {
+                return config.el;
+            } else {
+                throw "The el option is required";
+            }
+        }();
+        this.trigger = function () {
+            if (config.trigger) {
+                return config.trigger;
+            } else {
+                throw "The trigger option is required";
+            }
+        }();
         this.defaultDate = config.default || 'today';
         this.isRadio = !!(config.isRadio);
-        this.lang = (config.lang == 'CN') ? config.lang : 'EN'
+        this.lang = (config.lang == 'CN') ? config.lang : 'EN';
+        this.position = config.position || 'bottom';
         this.selectInterval = config.interval || [1970, 2030];
 
         this.showFn = config.showFn || function () {
@@ -93,6 +107,29 @@ var DatePicker;
 
         show: function () {
             this.target.style.display = 'inline-block';
+            this.target.style.position = 'absolute';
+
+            var selfW = this.trigger.offsetWidth,
+                selfH = this.trigger.offsetHeight,
+                offTop = this.trigger.offsetTop,
+                offLeft = this.trigger.offsetLeft;
+
+            var leftAttr, topAttr;
+            if (this.position == 'top') {
+                leftAttr = offLeft;
+                topAttr = offTop - selfH;
+            } else if (this.position == 'right') {
+                leftAttr = offLeft + selfW;
+                topAttr = offTop;
+            } else if (this.position == 'left') {
+                leftAttr = offLeft - selfW;
+                topAttr = offTop;
+            } else {
+                leftAttr = offLeft;
+                topAttr = offTop + selfH;
+            }
+            this.target.style.left = leftAttr + 'px';
+            this.target.style.top = topAttr + 'px';
             this.showFn();
         },
 
