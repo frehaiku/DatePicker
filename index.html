@@ -21,7 +21,7 @@
     var dateComponent = new DatePicker({
         el: document.querySelector('#calendar'),
         trigger: document.querySelector('#datePicker'),
-        afterSelectFn: function (curr) {
+        onchange: function (curr) {
             dateInput.value = curr;
         }
     });
