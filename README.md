@@ -7,7 +7,12 @@ Without jQuery-based date component with support for date ranges, muitiple calen
 - el: 
     - type: **Element**
     - required: `true`
-    - description: A calendar container 
+    - description: Calendar container
+- trigger:
+    - type: **Element**
+    - required: `true`
+    - description: Provoke DatePicker show and hide
+    - eg: `input element`(onfocus show the DatePicker)
 - defaultDate:
     - type: **String**
     - default: `'today'`
@@ -22,7 +27,11 @@ Without jQuery-based date component with support for date ranges, muitiple calen
     - options: `'EN'` | `'CN'`
     - default: `'EN'`
     - description: The font language, for `CN` will use Chinese, for `EN` will use English
-- selectInterval: 
+- position:
+    - type: **String**
+    - options: `'top'` | `'right'` | `'left'` | `'bottom'`
+    - default: `'bottom'`
+- selectInterval:
     - type: **Array**
     - default: `[1970, 2030]`
     - eg:`[2000, 2020]`
@@ -33,9 +42,9 @@ Without jQuery-based date component with support for date ranges, muitiple calen
 - hideFn:
     - type: **Function**
     - description: After hide callback 
-- afterSelectFn:
+- onchange:
     - type: **Function**
-    - description: Rewrite dateString to element
+    - description: callback which observe datePicker change
 
 ## Methods
 
@@ -54,18 +63,18 @@ Without jQuery-based date component with support for date ranges, muitiple calen
     ```
     
 
-```js
+    ```js
    var dateComponent = new DatePicker({
            el: document.querySelector('#calendar'),
-           afterSelectFn: function (curr) {
+           onchange: function (curr) {
                dateInput.value = curr;
            }
    });
-   
+
    var dateInput = document.querySelector('#datePicker');
-   
+
    dateInput.onfocus = function () {
         dateComponent.show();
    };
-```
+    ```
 

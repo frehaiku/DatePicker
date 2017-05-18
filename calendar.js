@@ -34,7 +34,7 @@ var DatePicker;
             };
         this.hideFn = config.hideFn || function () {
             };
-        this.afterSelectFn = config.afterSelectFn || function () {
+        this.onchange = config.onchange || function () {
             };
         // 当前日历数据
         this.nonceYear = 0;
@@ -109,24 +109,26 @@ var DatePicker;
             this.target.style.display = 'inline-block';
             this.target.style.position = 'absolute';
 
-            var selfW = this.trigger.offsetWidth,
-                selfH = this.trigger.offsetHeight,
+            var triggerW = this.trigger.offsetWidth,
+                triggerH = this.trigger.offsetHeight,
                 offTop = this.trigger.offsetTop,
                 offLeft = this.trigger.offsetLeft;
 
+            var targetW = this.target.offsetWidth,
+                targetH = this.target.offsetHeight;
             var leftAttr, topAttr;
             if (this.position == 'top') {
                 leftAttr = offLeft;
-                topAttr = offTop - selfH;
+                topAttr = offTop - targetH;
             } else if (this.position == 'right') {
-                leftAttr = offLeft + selfW;
+                leftAttr = offLeft + triggerW;
                 topAttr = offTop;
             } else if (this.position == 'left') {
-                leftAttr = offLeft - selfW;
+                leftAttr = offLeft - targetW;
                 topAttr = offTop;
             } else {
                 leftAttr = offLeft;
-                topAttr = offTop + selfH;
+                topAttr = offTop + triggerH;
             }
             this.target.style.left = leftAttr + 'px';
             this.target.style.top = topAttr + 'px';
@@ -456,7 +458,7 @@ var DatePicker;
 
                             self._setDateList();
 
-                            self.afterSelectFn(self.get());
+                            self.onchange(self.get());
 
                             // 判断是否为范围选择
                             if (!self.isRadio && self.selectedDate.end.year) {
