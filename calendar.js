@@ -73,11 +73,13 @@ var DatePicker;
             return handler;
         },
 
-        delegates: function (e, tagName, fn) {
-            var event = e || window.event,
-                target = event.target || event.srcElement;
-            if (target.tagName.toLowerCase() === tagName) {
-                fn.call(null, target);
+        delegates: function (tagName, fn) {
+            return function (e) {
+                var event = e || window.event,
+                    target = event.target || event.srcElement;
+                if (target.tagName.toLowerCase() === tagName) {
+                    fn.call(null, target);
+                }
             }
         },
 
@@ -443,31 +445,31 @@ var DatePicker;
              */
             utils.bind(document,
                 'click',
-                function (e) {
-                    utils.delegates(e,
-                        'li',
-                        function (t) {
-                            // 父元素不是ul.date时跳出
-                            if (!t.parentNode.classList.contains('date')) return;
+                utils.delegates(
+                    'li',
+                    function (t) {
+                        // 父元素不是ul.date时跳出
+                        if (!t.parentNode.classList.contains('date')) return;
 
-                            if (self.isRadio) {
-                                selectRadio(self, 'begin', t);
-                            } else {
-                                selectRange(self, t);
-                            }
+                        if (self.isRadio) {
+                            selectRadio(self, 'begin', t);
+                        } else {
+                            selectRange(self, t);
+                        }
 
-                            self._setDateList();
+                        self._setDateList();
 
-                            self.onchange(self.get());
+                        self.onchange(self.get());
 
-                            // 判断是否为范围选择
-                            if (!self.isRadio && self.selectedDate.end.year) {
-                                self.hide();
-                            } else if (self.isRadio) {
-                                self.hide();
-                            }
-                        })
-                });
+                        // 判断是否为范围选择
+                        if (!self.isRadio && self.selectedDate.end.year) {
+                            self.hide();
+                        } else if (self.isRadio) {
+                            self.hide();
+                        }
+                    }
+                )
+            );
 
             // 选一个日期时
             function selectRadio(oDate, type, target) {
