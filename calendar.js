@@ -547,6 +547,33 @@ var DatePicker;
 
                 });
 
+            /**
+             * 点击非日历处隐藏日历
+             */
+            utils.bind(document,
+            'click',
+            function (e) {
+                var t = e.target,
+                    p = t.parentNode
+
+                while (
+                    !(/dateWrap/.test(p.className)) &&
+                        p !== document
+                    ) {
+                    p = p.parentNode
+                }
+                // 日期为动态生成,contains API无效,应采用冒泡方式
+                if (
+                    (
+                        !(/dateWrap/.test(p.className)) ||
+                        self.target.contains(t)
+                    ) &&
+                    !self.trigger.contains(t)
+                ) {
+                    self.hide()
+                }
+            })
+
         }
     }
 
