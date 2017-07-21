@@ -378,18 +378,18 @@ var DatePicker = (function () {
     },
     /**
      *  默认选中年份和月份选择框
+     *  2017/07/21 fixed
+     *  `<option selected>2012</option>
+     *  <option>2013</option>`
+     *  先removeAttribute(2012)，再setAttribute(2013)。2013不能被选中，改用opt.select=Boolean
      * @param selector
      * @param tag
      * @private
      */
     _selected: function (selector, tag) {
       var options = this.target.querySelectorAll(selector);
-      ([]).forEach.call(options, function (ele) {
-        if (ele.value === tag.toString()) {
-          ele.setAttribute('selected', 'selected');
-        } else {
-          ele.removeAttribute('selected');
-        }
+      ([]).forEach.call(options, function (opt) {
+        opt.selected = opt.value === tag.toString()
       });
     },
 
