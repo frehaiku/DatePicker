@@ -18,18 +18,16 @@
 
 <script src="calendar.js"></script>
 <script>
+    var trigger = document.querySelector('#datePicker');
     var dateComponent = new DatePicker({
         el: document.querySelector('#calendar'),
-        trigger: document.querySelector('#datePicker'),
+        trigger: trigger,
         onchange: function (curr) {
-            dateInput.value = curr;
+            trigger.value = curr;
         }
     });
 
-    var dateInput = document.querySelector('#datePicker');
-
-
-    dateInput.onfocus = function () {
+    trigger.onfocus = function () {
         dateComponent.show();
     };
 </script>

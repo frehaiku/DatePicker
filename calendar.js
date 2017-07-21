@@ -1,7 +1,4 @@
-var DatePicker;
-
-(function () {
-  "use strict";
+var DatePicker = (function () {
 
   /**
    * 日历组件
@@ -29,6 +26,7 @@ var DatePicker;
     this.lang = (config.lang == 'CN') ? config.lang : 'EN';
     this.position = config.position || 'bottom';
     this.selectInterval = config.interval || [1970, 2030];
+    this.isShow = true;
 
     this.showFn = config.showFn || function () {
       };
@@ -59,20 +57,25 @@ var DatePicker;
     this.init();
   }
 
-  DatePicker = Calendar;
+  // DatePicker = Calendar;
   var utils = {
+    // 惰性载入
     bind: function (el, event, listener) {
-      var handler;
       if (el.addEventListener) {
-        handler = el.addEventListener(event, listener);
+        this.bind = function (el, event, listener) {
+          el.addEventListener(event, listener);
+        }
       } else if (el.attachEvent) {
-        handler = document.attachEvent.call(el);
+        this.bind = function (el, event, listener) {
+          el.attachEvent.call(el, event, listener);
+        }
       } else {
-        handler = el.on[event] = listener;
+        this.bind = function (el, event, listener) {
+          el.on[event] = listener;
+        }
       }
-      return handler;
+      return this.bind.apply(this, arguments);
     },
-
     delegates: function (tagName, fn) {
       return function (e) {
         var event = e || window.event,
@@ -109,6 +112,7 @@ var DatePicker;
 
     show: function () {
       this.target.style.display = 'inline-block';
+      this.isShow = true;
       this.target.style.position = 'absolute';
 
       var triggerW = this.trigger.offsetWidth,
@@ -139,6 +143,7 @@ var DatePicker;
 
     hide: function () {
       this.target.style.display = 'none';
+      this.isShow = false;
       this.hideFn();
     },
 
@@ -553,26 +558,24 @@ var DatePicker;
       utils.bind(document,
         'click',
         function (e) {
-          var t = e.target,
-            p = t.parentNode
-
-          while (
-          !(/dateWrap/.test(p.className)) &&
-          p !== document
-            )
-            p = p.parentNode
-          // 日期为动态生成,contains API无效,应采用冒泡方式
-          if (
-            (
-              !(/dateWrap/.test(p.className)) ||
-              self.target.contains(t)
-            ) && !self.trigger.contains(t)
-          ) {
-            self.hide()
+          var showDP = self.isShow,
+            t = e.target,
+            breakReg = /dateWrap|calendar\-wrapper/;
+          while (t) {
+            if (t == self.trigger || t.className && t.className.search(breakReg) != -1) {
+              showDP = false;
+              break;
+            }
+            t = t.parentNode
+          }
+          if (showDP) {
+            self.hide();
+            return true;
           }
         })
-
     }
   }
-
+  return Calendar;
 })();
+
+!window.DatePicker && (window.DatePicker = DatePicker);
