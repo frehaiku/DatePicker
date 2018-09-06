@@ -483,10 +483,10 @@ var DatePicker = (function () {
         var clkId = [].indexOf.call(target.parentElement.children, target);
         if (!oDate.renderDate[clkId].isInner) {
           if (oDate.selectedDate[type].day > 15) {
-            oDate.selectedDate[type].month = oDate.nonceMonth - 1;
+            oDate.selectedDate[type].month = (oDate.nonceMonth - 1 < 0) ? 11 : oDate.nonceMonth - 1;
             oDate._prevMonth();
           } else {
-            oDate.selectedDate[type].month = oDate.nonceMonth + 1;
+            oDate.selectedDate[type].month = (oDate.nonceMonth + 1 >= 12) ? 0 : oDate.nonceMonth + 1;
             oDate._nextMonth();
           }
         } else {
