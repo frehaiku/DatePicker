@@ -13,7 +13,7 @@ Without jQuery-based date component with support for date ranges, muitiple calen
     - required: `true`
     - description: Provoke DatePicker show and hide
     - eg: `input element`(onfocus show the DatePicker)
-- defaultDate:
+- default:
     - type: **String**
     - default: `'today'`
     - eg: `'2017-04-15'`
@@ -31,7 +31,7 @@ Without jQuery-based date component with support for date ranges, muitiple calen
     - type: **String**
     - options: `'top'` | `'right'` | `'left'` | `'bottom'`
     - default: `'bottom'`
-- selectInterval:
+- interval:
     - type: **Array**
     - default: `[1970, 2030]`
     - eg:`[2000, 2020]`
